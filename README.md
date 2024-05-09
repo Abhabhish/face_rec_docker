@@ -1,4 +1,12 @@
 ```
+git clone https://github.com/Abhabhish/face_rec_docker.git
+```
+
+```
+cd face_rec_docker
+```
+
+```
 docker build --network=host -t python-django:v0 .
 ```
 
