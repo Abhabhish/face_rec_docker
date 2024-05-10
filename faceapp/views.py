@@ -14,20 +14,23 @@ def face(request):
         for root,dirs,files in os.walk('images'):
             for file in files:
                 if '.jpg' in file.lower() or '.png' in file.lower() or '.jpeg' in file.lower():
-                    img_path = os.path.join(root,file)
-                    img = face_recognition.load_image_file(img_path)
-                    fe = face_recognition.face_encodings(img)
-                    if fe:
-                        fe = fe[0]
-                        all_faces = FaceData.objects.all()
-                        for face in all_faces:
-                            encoding = np.frombuffer(face.encodings, dtype=np.float64)
-                            comparison = face_recognition.compare_faces([encoding], fe)
-                            if all(comparison):
-                                if img_path not in response:
-                                    response[img_path] = []
-                                response[img_path].append(face.file_path)
-                        FaceData.objects.create(file_path=img_path, encodings=np.array(fe).tobytes())
+                    try:
+                        img_path = os.path.join(root,file)
+                        img = face_recognition.load_image_file(img_path)
+                        fe = face_recognition.face_encodings(img)
+                        if fe:
+                            fe = fe[0]
+                            all_faces = FaceData.objects.all()
+                            for face in all_faces:
+                                encoding = np.frombuffer(face.encodings, dtype=np.float64)
+                                comparison = face_recognition.compare_faces([encoding], fe)
+                                if all(comparison):
+                                    if img_path not in response:
+                                        response[img_path] = []
+                                    response[img_path].append(face.file_path)
+                            FaceData.objects.create(file_path=img_path, encodings=np.array(fe).tobytes())
+                    except Exception as e:
+                        print(e)
         return JsonResponse(response)
     else:
         return JsonResponse({"error": "POST request required."}, status=400)
